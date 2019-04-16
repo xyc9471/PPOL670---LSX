@@ -194,17 +194,17 @@
     rename(numbirth = S47A,
            numdied = S47)
   
-  # 3) Generate a dummy for whether a woman has children
-  children1$kids <- 0
-  children1$kids[children1$numbirth > 0] <- 1
-  
-  # 4) Generate a var indicating number of children
+  # 3) Generate a var indicating number of children
   children2 <- 
     children1 %>% 
     mutate_all(funs(replace_na(.,0)))
   
   children2$numkids <- children2$numbirth - children2$numdied  
   children2 <- subset(children2, numkids >= 0)
+  
+  # 4) Generate a dummy for whether a woman has children
+  children2$kids <- 0
+  children2$kids[children2$numkids > 0] <- 1
   
   # 5) Export the dataset
   children3 <- subset(children2, select = -c(numbirth, numdied))
@@ -235,6 +235,9 @@
     children <- read_dta(file.path(output,
                                  "children.dta")) # children information
     # 2) Merging the jobs
+    master <-
+      master %>%
+      rename(IDind = Idind)
     final <- merge(master, jobs, by = c("IDind"), all.x = TRUE)
     
     # 3) Merging the income
