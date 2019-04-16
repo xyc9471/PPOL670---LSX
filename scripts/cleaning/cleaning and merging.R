@@ -23,7 +23,10 @@
   rawdata        <- file.path(dataWorkFolder, "rawdata")
   output         <- file.path(dataWorkFolder, "intermediate")
   finaldata      <- file.path(dataWorkFolder, "finaldata")
-
+  outcomes       <- file.path(projectFolder, "outputs")
+  visual         <- file.path(outcomes, "visualizations")
+  tables         <- file.path(outcomes, "tables")
+  
 ### PART 2: Load Packages -------------------------------------------------------
   
   packages <- c("haven",
