@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------ #
 #                                                                               #
-#                                    DIME                                       #
-#                   Data Cleaning for PPOL670 Final Project                     #
+#                          PPOL 670 - Final Project                             #
+#                              Data Cleaning                                    #
 #                                                                               #
 #                                                                               #
 #------------------------------------------------------------------------------ #
@@ -258,7 +258,7 @@
     
     # 6) Merging household information
     hhinfo <- subset(hhinfo, select = -c(WAVE))
-    final2 <- merge(final, hhinfo, by = c("hhid"), all.x = TRUE)    
+    final <- merge(final, hhinfo, by = c("hhid"), all.x = TRUE)    
     
     # 7) Merging children information
     children <- subset(children, select = -c(wave))
