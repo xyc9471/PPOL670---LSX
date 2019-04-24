@@ -57,14 +57,36 @@
 
 ### PART 4: Preprocess the data ----------------------------------------------------
     
-  # 1) Remove missing values in working status
-  data1 <- data[!is.na(data$IDind),]
-  data1 <- data1[!is.na(data$working),]
-  data1 <- data1[data1$working != -9,]
+  # 1) Generate Gender Dummy
+    data$female <- 0
+    data$female[FinalData$GENDER == 2] <- 1
+    
+  # 2) Generate marital status dummy # reference group: single
+    data$married <- 0
+    data$married[data$mar_status == 2] <- 1
+    
+    data$divorced <- 0
+    data$divorced[data$mar_status == 3] <- 1
+    
+    data$widowed <- 0
+    data$widowed[data$mar_status == 4] <- 1
+    
+    data$separate <- 0
+    data$separate[data$mar_status == 5] <- 1
+    
+  # 3) Generate urban dummy # reference group: rural
+    data$urban <- 0
+    data$urban[data$area == 1] <- 1
+    
+  # 4) Remove missing values in working status
+    data1 <- data[!is.na(data$IDind),]
+    data1 <- data1[!is.na(data$working),]
+    data1 <- data1[data1$working != -9,]
   
-  # 2) Remove irrelavant variables
-  data2 <- subset(data1, select = -c(hhid, IDind, WEST_DOB_Y, wave, jobs, educ_year, inschool, kids))
-  
+  # 5) Remove irrelavant variables
+    data2 <- subset(data1, select = -c(hhid, IDind, WEST_DOB_Y, wave, jobs, educ_year, inschool, province,
+                                       mar_status, numkids, GENDER, indinc_cpi))
+
 ### PART 5: Split the data --------------------------------------------------------
   index = createDataPartition(data2$working, p=.75, list=F) 
   train_data = data2[index,]
@@ -100,34 +122,27 @@
 
 ### PART 7: convert variables that have right-skewed distribution
     
-    # 1) Convert individual income
-    convert_indinc <- . %>% 
-      mutate(indinc_cpi = log(indinc_cpi + 417286.33333))
-    
-    train_data2 <- train_data1 %>%  convert_indinc() # Apply to both the training and test data
-    test_data2 <- test_data1 %>%  convert_indinc()
-   
-    # 2) Convert household income
+    # 1) Convert household income
     convert_hhinc <- . %>% 
       mutate(hhinc_cpi = log(hhinc_cpi + 679519.07229))
     
-    train_data2 <- train_data2 %>%  convert_hhinc() # Apply to both the training and test data
-    test_data2 <- test_data2 %>%  convert_hhinc()
+    train_data2 <- train_data1 %>%  convert_hhinc() # Apply to both the training and test data
+    test_data2 <- test_data1 %>%  convert_hhinc()
     
-    # 3) Checking for results
+    # 2) Checking for results
     skim(train_data2)
     skim(test_data2)
     
-    # 4) Normalize the scale
+    # 3) Normalize the scale
     rcp <- 
       recipe(working~.,train_data2) %>% 
-      step_range(educ_degree, indinc_cpi, province, hhsize, hhinc_cpi, NATIONALITY, numkids) %>%  # Normalize scale
+      step_range(educ_degree, hhinc_cpi, hhsize, NATIONALITY) %>%  # Normalize scale
       prep()
 
     train_data3 <- bake(rcp,train_data2) # apply to both train data and test dat
     test_data3 <- bake(rcp,test_data2) 
 
-    # 5) check for converted and normalized variables
+    # 4) check for converted and normalized variables
     skim(train_data3)
     skim(test_data3)
 
@@ -241,14 +256,17 @@
         mtry <- 10
         
         # parameters
-        rf_tune <- expand.grid(mtry = 14, splitrule = "gini",
+        rf_tune <- expand.grid(mtry = 12, splitrule = "gini",
                                min.node.size = 1
         )
         
         mod_rf2 <-
           train(working ~ ., # Equation (outcome and everything else)
                 data=train_data3, # Training data
-                method = "ranger", # Classification Tree metric = "ROC", # area under the curve tuneGrid = rf_tune, # Tuning parameters importance = 'impurity',
+                method = "ranger", # Classification Tree 
+                metric = "ROC", # area under the curve 
+                tuneGrid = rf_tune, # Tuning parameters 
+                importance = 'impurity',
                 trControl = control_conditions
           )
         
@@ -276,12 +294,12 @@
     pred <- predict(mod_rf,newdata = test_data3) 
     confusionMatrix(table(pred,test_data3$working))
     # 1) variance importance
-    plot(varImp(mod_cart2))
+    plot(varImp(mod_rf))
     
     # 2) dependency plot
     grid.arrange(
-      partial(mod_cart2,pred.var = "GENDER",plot = T), 
-      partial(mod_cart2,pred.var = "indinc_cpi",plot = T), 
-      partial(mod_cart2,pred.var = "educ_degree", plot = T)
+      partial(mod_rf,pred.var = "educ_degree",plot = T), 
+      partial(mod_rf,pred.var = "female",plot = T), 
+      partial(mod_rf,pred.var = "hhsize", plot = T)
     )
     
