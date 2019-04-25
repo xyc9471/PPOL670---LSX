@@ -29,8 +29,7 @@ dat1
 
 #log income
 dat2 <- dat1 %>% 
-  mutate(indinc_cpi = log(indinc_cpi + 417286.33333)) %>%
-  mutate(hhinc_cpi = log(hhinc_cpi + 679519.07229))
+  mutate(indinc_cpi = log(indinc_cpi + 417286.33333))
 dat2
 
 #Changing to factors
