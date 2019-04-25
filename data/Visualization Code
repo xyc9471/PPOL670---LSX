@@ -11,22 +11,12 @@ tables         <- file.path(outcomes, "tables")
 
 
 #Loading Packages
-
-packages <- c("haven",
-              "tidyverse",
-              "tidyr",
-              "reshape",
-              "ggplot2")
+require(haven)
+require(tidyverse)
+require(shiny)
+require(sf)
 
 
-sapply(packages, function(x) {
-  print(x)
-  if (x %in% installed.packages() == FALSE) {
-    install.packages(x, dependencies = TRUE) 
-  }
-  library(x, 
-          character.only = T)
- 
  #Subsetting educ_degree
 dat <- read_dta("FinalData.dta")
 vis1 = subset(dat, educ_degree > 0)
