@@ -35,7 +35,8 @@
                   "ggplot2",
                   "stargazer",
                   "MASS",
-                  "ISLR")
+                  "ISLR",
+                  "plotROC")
     
     sapply(packages, function(x) {
       print(x)
@@ -56,7 +57,7 @@
     
   # 1) Generate Gender Dummy
     data$female <- 0
-    data$female[FinalData$GENDER == 2] <- 1
+    data$female[data$GENDER == 2] <- 1
     
   # 2) Generate marital status dummy # reference group: single
     data$married <- 0
@@ -82,7 +83,7 @@
                     married + divorced + widowed + separate +
                     hhsize + kids, 
                   data = data, family = binomial)
-
+    rocplot(logit1)
     summary(logit1)
  
   # 2) Make a table
@@ -98,4 +99,11 @@
   # 3) Calculate the odds ratio
     odds <- exp(coefficients(logit1))
     odds <- as.data.frame(odds)
+  
+  # 4) Predict the output and prepare the output for roc
+    prob <- predict(logit1, newdata = data, type=c("response"))
+    data$prob <- prob
+    logit_roc <- roc(working ~ prob, data = data)
+    plot(logit_roc)
+    ggsave("logit_roc.png", path = visual)
     

@@ -38,7 +38,8 @@
                   "skimr",
                   "rattle",
                   "pdp",
-                  "e1071")
+                  "e1071",
+                  "plotROC")
     
     sapply(packages, function(x) {
       print(x)
@@ -59,7 +60,7 @@
     
   # 1) Generate Gender Dummy
     data$female <- 0
-    data$female[FinalData$GENDER == 2] <- 1
+    data$female[data$GENDER == 2] <- 1
     
   # 2) Generate marital status dummy # reference group: single
     data$married <- 0
@@ -85,7 +86,7 @@
   
   # 5) Remove irrelavant variables
     data2 <- subset(data1, select = -c(hhid, IDind, WEST_DOB_Y, wave, jobs, educ_year, inschool, province,
-                                       mar_status, numkids, GENDER, indinc_cpi))
+                                       mar_status, numkids, GENDER, indinc_cpi, hhinc_cpi))
 
 ### PART 5: Split the data --------------------------------------------------------
   index = createDataPartition(data2$working, p=.75, list=F) 
@@ -121,28 +122,17 @@
     skim(test_data1)
 
 ### PART 7: convert variables that have right-skewed distribution
-    
-    # 1) Convert household income
-    convert_hhinc <- . %>% 
-      mutate(hhinc_cpi = log(hhinc_cpi + 679519.07229))
-    
-    train_data2 <- train_data1 %>%  convert_hhinc() # Apply to both the training and test data
-    test_data2 <- test_data1 %>%  convert_hhinc()
-    
-    # 2) Checking for results
-    skim(train_data2)
-    skim(test_data2)
-    
-    # 3) Normalize the scale
+
+    # 1) Normalize the scale
     rcp <- 
-      recipe(working~.,train_data2) %>% 
-      step_range(educ_degree, hhinc_cpi, hhsize, NATIONALITY) %>%  # Normalize scale
+      recipe(working~.,train_data1) %>% 
+      step_range(educ_degree, hhsize, NATIONALITY) %>%  # Normalize scale
       prep()
 
-    train_data3 <- bake(rcp,train_data2) # apply to both train data and test dat
-    test_data3 <- bake(rcp,test_data2) 
+    train_data3 <- bake(rcp,train_data1) # apply to both train data and test dat
+    test_data3 <- bake(rcp,test_data1) 
 
-    # 4) check for converted and normalized variables
+    # 2) check for converted and normalized variables
     skim(train_data3)
     skim(test_data3)
 
@@ -226,7 +216,6 @@
         test_data3$working <- as.factor(test_data3$working)
         levels(test_data3$working) <- c("unemployed", "employed")
         
-        install.packages('e1071', dependencies=TRUE) 
         pred <- predict(mod_cart,newdata = test_data3) 
         shallow_tree_table <-
           confusionMatrix(table(pred,test_data3$working))
@@ -256,7 +245,7 @@
         mtry <- 10
         
         # parameters
-        rf_tune <- expand.grid(mtry = 12, splitrule = "gini",
+        rf_tune <- expand.grid(mtry = 11, splitrule = "gini",
                                min.node.size = 1
         )
         
@@ -293,6 +282,7 @@
 ### PART 10: Variable Importance --------------------------------------------------
     pred <- predict(mod_rf,newdata = test_data3) 
     confusionMatrix(table(pred,test_data3$working))
+    
     # 1) variance importance
     plot(varImp(mod_rf))
     
@@ -302,4 +292,14 @@
       partial(mod_rf,pred.var = "female",plot = T), 
       partial(mod_rf,pred.var = "hhsize", plot = T)
     )
-    
+
+### PART 11: Plot the ROC of random forest -------------------------------
+    prob <- as.data.frame(predict(mod_rf, newdata = test_data3, type = c("prob")))
+    test_data3 <- cbind(test_data3, prob)
+    roc1 <- roc(test_data3$working, test_data3$employed)
+    roc2 <- roc(test_data3$working, test_data3$unemployed)
+    roc.list <- roc(working ~ employed + unemployed, data = test_data3)
+    ggroc(roc1, linetype = 1,
+          legacy.axes = TRUE) +
+      geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1), color="darkgrey", linetype="dashed")
+        
