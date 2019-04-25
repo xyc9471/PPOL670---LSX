@@ -1,0 +1,83 @@
+#Setting up work directory
+
+projectFolder  <- file.path("/Users/apple/Documents/GitHub/PPOL670---LSX")
+dataWorkFolder <- file.path(projectFolder, "data")
+rawdata        <- file.path(dataWorkFolder, "rawdata")
+output         <- file.path(dataWorkFolder, "intermediate")
+finaldata      <- file.path(dataWorkFolder, "finaldata")
+outcomes       <- file.path(projectFolder, "outputs")
+visual         <- file.path(outcomes, "visualizations")
+tables         <- file.path(outcomes, "tables")
+
+
+#Loading Packages
+
+packages <- c("haven",
+              "tidyverse",
+              "tidyr",
+              "reshape",
+              "ggplot2")
+
+
+sapply(packages, function(x) {
+  print(x)
+  if (x %in% installed.packages() == FALSE) {
+    install.packages(x, dependencies = TRUE) 
+  }
+  library(x, 
+          character.only = T)
+ 
+ #Subsetting educ_degree
+dat <- read_dta("FinalData.dta")
+vis1 = subset(dat, educ_degree > 0)
+vis1 = subset(vis1, educ_degree < 9)
+head(dat)
+
+#Ommitting N.A.
+dat1 <- na.omit(dat)
+dat1
+
+#log income
+dat2 <- dat1 %>% 
+  mutate(indinc_cpi = log(indinc_cpi + 417286.33333)) %>%
+  mutate(hhinc_cpi = log(hhinc_cpi + 679519.07229))
+dat2
+
+#Changing to factors
+dat2$GENDER <- as.factor(dat2$GENDER)
+dat2$educ_degree <- as.factor(dat2$educ_degree)
+dat2$area <- as.factor(dat2$area)
+dat2$kids <- as.factor(dat2$kids)
+dat2
+str(dat2)
+
+
+labels <- c("1" = "Male", "2" = "Female")
+
+Boxplot4 <- ggplot(dat2, aes(y=indinc_cpi, x=area, color = area)) +
+          geom_violin() +    
+          facet_wrap(~GENDER, labeller = labeller(GENDER = labels)) +
+          labs(title = "Income by Area Faceted by Gender", subtitle = "We see a drastic increase in income levels for males in Urban against Rural,
+       however, this increase is not early as significant for females", caption = "Data Source: China Nutrition and Health Survey") +
+       theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5)) +
+       xlab("Area") +
+       ylab("Logged Individual Income") +
+       scale_x_discrete(labels = c('rural', 'urban')) +
+       scale_color_manual(values = c("red", "blue"), labels = c('Rural','Urban'))
+
+print(Boxplot4)
+
+
+Boxplot5 <- ggplot(dat2, aes(y=indinc_cpi, x=kids, color = kids)) + 
+geom_violin() +    
+    facet_wrap(~GENDER, labeller = labeller(GENDER = labels)) +
+    labs(title = "Income if Women Given Birth Faceted by Gender", subtitle = "Plot is faceted by gender to illustrate the drastic decrease in womens income and the overall 
+       employment rate after childbirth", caption = "Data Source: China Nutrition and Health Survey") +
+       theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5)) +
+       xlab("Children") +
+       ylab("Logged Individual Income") +
+       scale_x_discrete(labels = c('No', 'Yes')) +
+       scale_color_manual(values = c("red", "blue"), labels = c('No','Yes'))
+
+print(Boxplot5)
+```
