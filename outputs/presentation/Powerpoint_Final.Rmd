@@ -1,0 +1,130 @@
+---
+title: "Gender Gap in China"
+author: ""
+date: "4/25/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+require(knitr)
+```
+
+## Problem Statement 
+
+- Whether there is a gender gap in job market in terms of income and labor force participation 
+- By safeguarding the right of women to equal employment, we thus help to eliminate gender discriminiation and promote equality, 
+
+
+## Background
+
+- Growth in the Chinese economocy has generated great wealth and development in social equality, however, issues still persist:
+    
+    1. Employment competition
+    2. Oversupplied workforce
+    3. Workplace Gender discrimination
+
+
+## Research Design and Approah
+
+- Adopted survey data from the China Nutrition and Health Survey
+- Indicators used to test for gender gap:
+
+    1. Gender 
+    2. Income
+    3. Education
+    4. Urban vs Rural
+    5. Family with children or not
+    6. Marriage Status
+
+##Goals of Analysis    
+
+- To examine whether there is a gender gap in Chinese job market using logistic regressions 
+- What are the strong indicators of Chinese people’s employment status through supervised learning
+
+## Empirical Methods and Tools
+
+Our analysis follows this structure:
+
+   1. Visualization of descriptive statistics
+   2. Logistic Regression using a dummy indicating whether a person is working as dependent variable to explore if gender will be a significant indicator of employment status
+   3. Regression trees to explore other potential significant indicators of employment status
+   4. Shiny visualization
+
+
+## Visualization 1
+
+```{r , echo=FALSE, out.width = '100%'}
+
+knitr::include_graphics("/Users/terrysang/Documents/GitHub/outputs/visualizations/Vis1.png")
+
+```
+
+## Visualization 2
+
+```{r , echo=FALSE, out.width = '100%'}
+
+knitr::include_graphics("/Users/terrysang/Documents/GitHub/outputs/visualizations/Vis2.png")
+
+```
+
+## Visualization 3
+
+```{r pressure, echo=FALSE, out.width = '60%'}
+knitr::include_graphics("/Users/terrysang/Documents/GitHub/outputs/visualizations/violin1.png")
+```
+
+
+
+## Visualization 4
+
+```{r , echo=FALSE, out.width = '60%'}
+knitr::include_graphics("/Users/terrysang/Documents/GitHub/outputs/visualizations/violin2.png")
+```
+
+##Results 1: Logit Table
+
+
+```{r , echo=FALSE,out.width="75%", fig.align='center', }
+knitr::include_graphics(c("/Users/terrysang/Documents/GitHub/outputs/tables/Table 1.png"))
+
+```
+
+##Results 2: RANDOM ROC Comparison (Logit vs Random Forest)
+
+```{r , echo=FALSE,out.width="49%", out.height="20%",fig.cap="Logit vs Random Forest",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("/Users/terrysang/Documents/GitHub/outputs/visualizations/logit_roc.png","/Users/terrysang/Documents/GitHub/outputs/visualizations/random_roc.png"))
+
+```
+
+
+##Results 3: VARIMP
+
+```{r , echo=FALSE, out.width = '95%'}
+knitr::include_graphics("/Users/terrysang/Documents/GitHub/outputs/visualizations/varimp.png")
+```
+
+
+## Lessons Learned
+
+Confirms:
+
+- That disadvantages faced by females in the labor market in China exists
+
+Additionally:
+
+- Education level and gender are two significant indicators of a person’s employment status in China
+- As a person’s education level increases, his/her chance of getting education is higher
+
+
+## Next Steps: Policy Recommendations
+
+In the light of our findings, we recommend:
+
+- Introducing a parental leave policy that equally applies to men
+- Introducing an education policy reform that can reduce cost to women of receiving education
+
+
+
+
+
