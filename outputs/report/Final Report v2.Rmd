@@ -1,0 +1,104 @@
+---
+title: "PPOL670 Final Report"
+output: pdf_document
+author: "Team: LSX (Qianying Liu, Terry Sang, Yuchen Xiang)"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(knitr)
+```
+
+# Problem Statement and Background
+In the past few decades, China has experienced rapid economic growth. Women's education level and social status has been improving a lot as well. As a result, more and more women have become career-oriented and entered job market. However, the issue of employment competition has also become increasingly prominent, and the current labor market has already oversupplied. Under this circumstance, gender discrimination in workplace has become a common phenomenon in Chinese job market. For example, during job interviews, Chinese women are often asked explicitly by the employers about their marriage status and fertility decisions during interviews. 
+
+Thus, for our project, we try to examine whether there is a gender gap in job market in terms of income and labor force participation, and then which factors may contribute to labor force participation in China. Since safeguarding the right of women to equal employment is of great significance in eliminating gender discrimination, balancing the status of the two sexes, promoting economic development, and building a harmonious society, our data-based study may help policymakers advocate for promoting gender equality, and provide data-based support for policymakers to make targeted policy decisions to protect and ensure women’s rights and gender equality in job market.   
+
+# Research Design/Approach
+To explore our questions, we adopted survey data from China Nutrition and Health Survey. This survey provided us several separate datasets for more than 20,000 observer demographic information which including their, gender, education level, income, employment status, job type, marriage status, living areas and household size etc. Based on real Chinese employment situations, we considered several potential indicators of gender gap in workplace and merged these variables into one master dataset. Our goals of analysis are to examine whether there is a gender gap in Chinese job market using logistic regressions and what are the strong indicators of Chinese people’s employment status through supervised learning. Based on the analysis results, policy implications will be made.
+
+# Empirical Methods
+To examine our questions, we use data from the China Nutrition and Health Survey. This dataset is a representative sample of Chinese individuals, and includes information on each individual’s gender, household size, fertility, education levels, and living areas. Due to the cross-sectional and complex nature of the data, the survey team divided them into different data sets. We merged several elements of the survey to arrive at a comprehensive dataset. We first visualize the descriptive statistics to explore if there are any patterns in employment status. Then, we use logistic regressions using a dummy indicating whether a person is working as dependent variable to explore if gender will be a significant indicator of employment status. Later, we use classification and regression trees to explore other potential significant indicators of employment status. Lastly, we visualize the results using Shiny. 
+
+# Results and Discussion
+### 1. Preliminary Findings
+First, we used data visualization to have general understandings about the gender gap in terms of income and working status in labor market and how some variables including education level, marital status and living area influence income of men and women.
+
+• Figure1 Average Income by Gender and Education Level
+
+```{r echo=FALSE, width= "500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/Vis1.png")
+```
+Figure 1 shows that for degrees from primary school to college, male income was obviously higher than female income in average. However, with master or higher degrees, female average income was much above male average income. Also, higher education level are closely connected with higher income for both male and female.
+
+Also, for all the education level we considered, the percentage of employed men of total is higher than employed women of total. As a result, it may imply that male and female isn’t treated equally in job seeking process. However, for both male and female, ratio of working people with master degree or higher is lower than that with college degree.(Figure in Appendix)
+
+• Figure2 Average Income by Gender and Marital Status
+
+```{r echo=FALSE, width = "500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/Vis3.png")
+```
+Figure 2 shows that Male has higher average income than female with all kinds of Marital Status, except widowed. In general, people who are married earn more than people who are never married. The difference of income between married men and never married men is bigger than the difference between married women and never married women.
+
+• Figure3 Income by area Faceted by Gender
+
+```{r echo=FALSE, width = "500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/area.png")
+```
+Figure 3 shows the difference in income levels for both genders in rural and urban settings. As we can see, the difference in rural and urban income is quite significant. Urban males earn more than 70 percent more than rural males. This contrast also exists for females, but the difference is significantly lower. In this case, urban females only earn 40 percent more than rural females. 
+
+We also looked at income change for both genders as the number of children increases. Figure 4 shows the change in income as the number of children increases. For both genders, as the number of children increases income gradually decreases at the same level. One difference does exists at three children. We see income levels slightly recover for both genders, however, this recovery is much more pronounced for males. Furthermore, after three kids, while males’ income falls at the previous rate of decrease before three kids, women’s income levels decreases much more rapidly .(Figure in appendix)
+
+
+### 2. Empirical Results
+In order to examine whether there is a gender gap in labor force participation in China, we use Logistic Regression to explore whether gender will be a significant indicator of a person’s employment status. In table 1, we can see that if a person is female, she is 41% less likely to get employed than male, holding all else constant. Besides, education is another significant indicator of a person’s employment status. If a person’s education level increases by one degree, his/her chance of getting employed will be 18.6% higher. Thus, it is clear that Chinese women, on average, experience more difficulties in labor market. Below is logit Regressions and Odds Ratio.
+```{r echo=FALSE, out.height="400px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/tables/Table 1.png")
+```
+
+### 3. Machine Learning
+Once we determine that there is a gender gap in labor force participation in China, we use supervised machine learning to explore what are the important indicators of employment status. The methods include K-Nearest, Classification and Regression Trees, and Random Forest. After we compare the output of all three models, Random Forest stands out as the model has the best predict power. Figure 3 shows the importance of variables indicating employment status in China. It is clear that education level and gender are two important indicators of whether a person is working, which is consistent with our findings from using Logistic Regression. 
+```{r echo=FALSE}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/varimp.png")
+```
+
+Since we have logistic model and random forest model, we are wondering which model has better performance. Therefore, we used ROC curve to assess the accuracy of measurements for predicting a binary outcome. Below are ROC curves of two models. As we can see from two curves, Random forest model has better performance. Thus, we could say that Random forest is a better model for our study. 
+
+Logistic Model
+
+```{r echo=FALSE}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/logit_roc.png")
+```
+Random Forest
+
+```{r echo=FALSE, out.height="500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/random_roc.png")
+```
+
+# Conclusions and Policy Implications
+Given the results, we find that education level and gender are two significant indicators of a person’s employment status in China. As a person’s education level increases, his/her chance of getting education is higher. Moreover, being a female in China serves as a disadvantage in labor market. 
+
+In the light of our findings, we recommend:
+Introducing a parental leave policy that equally applies to men. In modern China, gender identity is still a statistically significant factor that negatively influences Chinese women’s labor force participation and earnings, because once women make the fertility decision, they have to take parental leave, thus incurring a higher operational cost on their employers. Introducing a parental leave policy that equally applies to men can equalize the operational costs of hiring males and females.
+
+Introducing an education policy reform that can reduce cost to women of receiving education. Our empirical results show that education is a strong indicator of whether a person can get employed. If we can reduce the cost of women receiving education, women can get access to education more easily and correspondingly find jobs more easily. 
+
+As a society develops to a stage where farming is no longer a major source of income for most families, and jobs increasingly require mental labor instead of physical labor, women will become as competitive as men in labor market. Thus, reforms in parental leave policy and education policy are necessary, not just to address the issue of gender gap in workplace, but also to promote the rights that women deserve.
+
+
+
+# Appendix
+
+
+# Figure 1
+```{r echo=FALSE, width= "500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/Vis2.png")
+```
+
+# Figure 2
+```{r echo=FALSE, width = "500px"}
+knitr::include_graphics("/Users/apple/Documents/GitHub/PPOL670---LSX/outputs/visualizations/numkids.png")
+```
