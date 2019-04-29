@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------ #
 #                                                                               #
 #                          PPOL 670 - Final Project                             #
-#                             Shiny Visualization                               #
+#                             Terry Visualizations                              #
 #                                                                               #
 #                                                                               #
 #------------------------------------------------------------------------------ #
@@ -65,46 +65,42 @@
     dat2$educ_degree <- as.factor(dat2$educ_degree)
     dat2$area <- as.factor(dat2$area)
     dat2$kids <- as.factor(dat2$kids)
+    dat2$numkids <- as.factor(dat2$numkids)
     dat2
     str(dat2)
     
     # 5) Create labels
     labels <- c("1" = "Male", "2" = "Female")
     
-### PART 5: Visualizing the Data Using Shiny ---------------------------------------
+### PART 5: Visualizing the Data ---------------------------------------
     
-    Boxplot4 <- 
+Boxplot4 <- 
       ggplot(dat2, aes(y=indinc_cpi, x=area, color = area)) +
-      geom_violin() + 
+      geom_bar(stat = "identity") + 
       facet_wrap(~GENDER, labeller = labeller(GENDER = labels)) +
-      labs(title = "Income by Area Faceted by Gender", 
-           subtitle = "We see a drastic increase in income levels for males in Urban against Rural; however, this increase is not early as significant for females", 
-           caption = "Data Source: China Nutrition and Health Survey") +
+      labs(title = "Income by Area Faceted by Gender", caption = "Data Source: China Nutrition and Health Survey") +
       theme(plot.title = element_text(hjust=0), 
             plot.subtitle = element_text(hjust=0)) +
       xlab("Area") +
-      ylab("Logged Individual Income") +
+      ylab("Individual Income") +
+      theme(legend.position="none") +
       scale_x_discrete(labels = c('rural', 'urban')) +
-      scale_color_manual(values = c("red", "blue"), 
-                         labels = c('Rural','Urban'))
+      scale_color_manual(values = c("brown", "grey"), 
+                         labels = c('Rural','Urban')) 
     print(Boxplot4)
     
     
-    Boxplot5 <- 
-      ggplot(dat2, aes(y=indinc_cpi, x=kids, color = kids)) + 
-      geom_violin() +    
+Boxplot5 <- 
+      ggplot(dat2, aes(x=numkids, y=indinc_cpi,  fill = numkids)) + 
+      geom_bar(position = "dodge", stat = "identity", fun.y = "mean") +
       facet_wrap(~GENDER, labeller = labeller(GENDER = labels)) +
-      labs(title = "Income of People Who have Children and Who Do Not", 
-           subtitle = "Plot is faceted by gender to illustrate the drastic decrease in womens' income and the overall employment rate after childbirth", 
+      labs(title = "Income as Number of Children Increases", 
            caption = "Data Source: China Nutrition and Health Survey") +
       theme(plot.title = element_text(hjust=0),
             plot.subtitle = element_text(hjust=0)) +
-      xlab("Whether a Person Has Children") +
+      xlab("Number of Children") +
       ylab("Logged Individual Income") +
-      labs(color = "Children") +
-      scale_x_discrete(labels = c('No', 'Yes')) +
-      scale_color_manual(values = c("red", "blue"),
-                         labels = c('No','Yes'))
+      labs(color = "Children")
     
     print(Boxplot5)
     
